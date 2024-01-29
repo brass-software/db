@@ -8,8 +8,9 @@ import (
 )
 
 type User struct {
-	Phone      string
-	LoginCodes map[string]bool
+	Phone         string
+	LoginCodes    map[string]bool
+	SessionTokens map[string]bool
 }
 
 func (u *User) ID() string {
@@ -29,4 +30,18 @@ func (u *User) CreateLoginCode() (string, error) {
 func (u *User) DeleteLoginCode(code string) error {
 	u.LoginCodes[code] = false
 	return u.Save()
+}
+
+func (u *User) Login(code string) (string, error) {
+	if !u.LoginCodes[code] {
+		return "", fmt.Errorf("bad login code")
+	}
+	delete(u.LoginCodes, code)
+	token := util.RandomToken(32)
+	u.SessionTokens[token] = true
+	err := u.Save()
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }
