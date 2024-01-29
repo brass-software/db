@@ -1,6 +1,8 @@
 package db
 
+import "github.com/mikerybka/brass"
+
 type Schema struct {
-	Types    map[string]Type
+	Types    map[string]brass.Type
 	RootType string
 }
